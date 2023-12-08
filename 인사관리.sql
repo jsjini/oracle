@@ -244,7 +244,7 @@ order by hire_date;
 -- 치환변수 (입력값이 &~값에 들어감)
 select employee_id, last_name, salary, department_id
 from employees
-where employee_id = &employee_num;
+where employee_id = &emp;
 
 select employee_id, last_name, job_id, &column_name
 from employees
@@ -426,3 +426,106 @@ from employees;
 select last_name, to_char(hire_date, 'fmDD Month YYYY') as hiredate
 from employees;
 
+select last_name, to_char(hire_date, 'fmDdspth "of" Month YYYY fmHH:MI:SS AM')
+from employees;
+
+select to_char(salary, '$99,999.00') as salary
+from employees;
+
+-- 제일 큰 자리수 만큼 9를 채워줘야함.
+select to_char(salary, '$9,999.00') as salary 
+from employees;
+
+select to_number('$3,400','$99,999')
+from dual;
+
+select to_date('2010년, 02월', 'YYYY"년", MM"월"')
+from dual;
+
+select last_name, hire_date
+from employees
+where hire_date > to_date('2005년 07월 01일', 'YYYY"년" MM"월" DD"일"');
+
+-- (-, /)와 같이 형태가 비슷하면 어느정도 적용이됨 .
+select last_name, hire_date
+from employees
+where hire_date > to_date('05/07/01', 'YY-MM-DD');
+
+-- 앞에 fx를 붙이면 정확하게 똑같아야 적용이됨.
+select last_name, hire_date
+from employees
+where hire_date > to_date('05/07/01', 'fxYY/MM/DD');
+
+-- 중요! 별5개 NVL 함수
+select last_name, salary, nvl(commission_pct, 0), (salary*12) + (salary*12*nvl(commission_pct, 0))
+from employees;
+
+select last_name, salary, nvl(commission_pct, 0)
+from employees;
+
+select last_name, salary, nvl(commission_pct, '보너스 없음')
+from employees;
+
+select last_name, salary, nvl(to_char(commission_pct), '보너스 없음')
+from employees;
+
+-- nvl2 는 첫번째식과 두번째,세번째 식의 데이터유형이 달라도되지만 두번째와 세번째 식의 데이터유형은 같아야함.
+select last_name, salary, commission_pct, nvl2(commission_pct, 'SAL+COMM', 'SAL') income
+from employees;
+
+-- 쓸일없음.
+select first_name, length(first_name), last_name, length(last_name), nullif(length(first_name), length(last_name))
+from employees;
+
+select  last_name, job_id, salary,
+        case job_id when 'IT_PROG'   then 1.10*salary
+                    when 'ST_CLERK'   then 1.15*salary
+                    when 'SA_REP'   then 1.20*salary
+                    else salary
+        end "REVISED_SALARY"
+from    employees;
+
+select  last_name, salary,
+        case    when salary < 5000   then 'Low'
+                when salary < 10000  then 'Medium'
+                when salary < 20000  then 'Good'
+                                     else 'Excellent'
+        end qualified_salary
+from    employees;
+
+-- DECODE 함수는 =(같다) 일때만 쓸 수 있다.
+select  last_name, job_id, salary,
+        decode(job_id, 'IT_PROG',  1.10*salary,
+                       'ST_CLERK', 1.15*salary,
+                       'SA_REP',   1.20*salary,
+                                   salary)
+        REVISED_SALARY
+from    employees;
+
+--5. 각 사원의 이름을 표시하고 근무 달 수(입사일로부터 현재까지의 달 수)를 계산하여 열 레이블을 MONTHS_WORKED로 지정하시오. 결과는 정수로 반올림하여 표시하시오.
+select  last_name, round(months_between(sysdate, hire_date)) as "MONTHS_WORKED"
+from    employees;
+
+--6. 모든 사원의 성 및 급여를 표시하기 위한 query를 작성합니다. 급여가 15자 길이로 표시되고 왼쪽에 $ 기호가 채워지도록 형식을 지정하시오. 열 레이블을 SALARY 로 지정합니다.
+select  last_name, lpad(salary, 15, '$') as salary
+from    employees;
+
+--7. 부서 90의 모든 사원에 대해 성(last_name) 및 재직 기간(주 단위)을 표시하도록 query 를 작성하시오. 주를 나타내는 숫자 열의 레이블로 TENURE를 지정하고 주를 나타내는 숫자 값을 정수로 나타내시오.
+select  last_name, round((sysdate-hire_date)/7) as tenure
+from    employees
+where   department_id = 90;
+
+--1. 각 사원에 대해 다음 항목을 생성하는 질의를 작성하고 열 레이블을 Dream Salaries로 지정하시오.
+--<employee last_name> earns <salary> monthly but wants <3 times salary>. 
+--<예시> Matos earns $2,600.00 monthly but wants $7,800.00. 
+select last_name || ' earns ' || to_char(salary, '$99,999.00') || ' monthly but wants ' || to_char(salary*3,'$99,999.00') as "Dream Salaries"
+from employees;
+
+--2. 사원의 이름, 입사일 및 급여 검토일을 표시하시오. 급여 검토일은 여섯 달이 경과한 후 첫번째 월요일입니다. 열 레이블을 REVIEW로 지정하고 날짜는 "2010.03.31 월요일"과 같은 형식으로 표시되도록 지정하시오.
+select last_name, hire_date, 
+
+--3. 이름, 입사일 및 업무 시작 요일을 표시하고 열 레이블을 DAY로 지정하시오. 월요일을 시작으로 해서 요일을 기준으로 결과를 정렬하시오.
+
+--4. 사원의 이름과 커미션을 표시하는 질의를 작성하시오. 커미션을 받지 않는 사원일 경우 “No Commission”을 표시하시오. 열 레이블은 COMM으로 지정하시오.
+
+--5. DECODE 함수와 CASE 구문을 사용하여 다음 데이터에 따라 JOB_ID 열의 값을 기준으로 모든 사원의 등급을 표시하는 질의를 작성하시오.
