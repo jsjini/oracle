@@ -381,3 +381,48 @@ where upper(substr(last_name, 1, 1)) in ('J','A','M')
 --or last_name like 'M%'
 order by last_name;
 
+select sysdate
+from dual;
+
+select last_name, (sysdate-hire_date)/7 as weeks
+from employees
+where department_id = 90;
+
+select employee_id, hire_date, months_between (sysdate, hire_date) tenure,
+add_months (hire_date, 6) review, next_day(hire_date, '±Ý'), last_day(hire_date)
+from employees;
+
+select round(sysdate, 'YEAR'),
+       round(sysdate, 'MONTH'),
+       round(sysdate, 'DAY'),
+       round(sysdate, 'DD')
+from dual;
+
+select trunc(sysdate, 'YEAR'),
+       trunc(sysdate, 'MONTH'),
+       trunc(sysdate, 'DAY'),
+       trunc(sysdate, 'DD')
+from dual;
+
+select *
+from employees
+where employee_id = '101';
+
+alter session set
+nls_date_language = american;
+
+select employee_id, to_char(hire_date, 'MM/YY')
+from employees;
+
+select last_name, to_char(hire_date, 'DD Month YYYY') as hiredate
+from employees;
+
+select last_name, to_char(hire_date, 'DD month YYYY') as hiredate
+from employees;
+
+select last_name, to_char(hire_date, 'DD MONTH YYYY') as hiredate
+from employees;
+
+select last_name, to_char(hire_date, 'fmDD Month YYYY') as hiredate
+from employees;
+
