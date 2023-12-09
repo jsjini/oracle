@@ -522,10 +522,32 @@ select last_name || ' earns ' || to_char(salary, '$99,999.00') || ' monthly but 
 from employees;
 
 --2. 사원의 이름, 입사일 및 급여 검토일을 표시하시오. 급여 검토일은 여섯 달이 경과한 후 첫번째 월요일입니다. 열 레이블을 REVIEW로 지정하고 날짜는 "2010.03.31 월요일"과 같은 형식으로 표시되도록 지정하시오.
-select last_name, hire_date, 
+select last_name, hire_date, to_char(next_day(add_months(hire_date, 6), '월'),'YYYY.MM.DD DAY') as review
+from employees;
 
 --3. 이름, 입사일 및 업무 시작 요일을 표시하고 열 레이블을 DAY로 지정하시오. 월요일을 시작으로 해서 요일을 기준으로 결과를 정렬하시오.
+select last_name, hire_date ,to_char(hire_date, 'DAY') as day
+from employees
+order by to_char(hire_date-1, 'D');
 
 --4. 사원의 이름과 커미션을 표시하는 질의를 작성하시오. 커미션을 받지 않는 사원일 경우 “No Commission”을 표시하시오. 열 레이블은 COMM으로 지정하시오.
+select last_name, nvl(to_char(commission_pct), '“No Commission”') as comm
+from employees;
 
 --5. DECODE 함수와 CASE 구문을 사용하여 다음 데이터에 따라 JOB_ID 열의 값을 기준으로 모든 사원의 등급을 표시하는 질의를 작성하시오.
+select job_id as "업무", case job_id when 'AD_PRES' then 'A'
+                                    when 'ST_MAN' then 'B'
+                                    when 'IT_PROG' then 'C'
+                                    when 'SA_REP' then 'D'
+                                    when 'ST_CLERK' then 'E'
+                                    else '0'
+                                    end "등급"
+from employees;
+
+select job_id as "업무", decode(job_id,'AD_PRES','A'
+                                     ,'ST_MAN','B'
+                                     ,'IT_PROG','C'
+                                     ,'SA_REP','D'
+                                     ,'ST_CLERK','E'
+                                     ,'0') "등급"
+from employees;
